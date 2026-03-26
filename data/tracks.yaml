@@ -1,0 +1,16 @@
+tracks:
+  - id: song-1
+    title: 룰라 - 3!4!
+    src: /music/룰라 - 3!4!.wav
+    targetTime: 10.0
+    description: 3!4!가 시작하는 타이밍에 탭하세요.
+  - id: song-2
+    title: 휘트니 휴스턴 - I Will Always Love You
+    src: /music/휘트니 휴스턴 - I Will Always Love You.mp3
+    targetTime: 18.4
+    description: And I가 시작하는 타이밍에 탭하세요.
+  - id: song-3
+    title: 요네즈 켄시 - KICKBACK
+    src: /music/요네즈 켄시 - KICKBACK.mp3
+    targetTime: 27.2
+    description: Lucky가 시작하는 타이밍에 탭하세요.
