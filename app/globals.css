@@ -189,9 +189,31 @@ body {
   font-size: 16px;
 }
 
+.now-playing {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--card) 92%, #7aa6ff 8%);
+}
+
+.now-playing h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.now-playing p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 audio {
   width: 100%;
   margin-top: 6px;
+}
+
+.sr-audio {
+  display: none;
 }
 
 .game-actions {
@@ -281,12 +303,8 @@ button:disabled {
   color: var(--perfect);
 }
 
-.grade-fast {
+.grade-too-fast {
   color: var(--fast);
-}
-
-.grade-slow {
-  color: var(--slow);
 }
 
 .grade-too-slow {

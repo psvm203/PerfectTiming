@@ -14,13 +14,15 @@ export type Track = {
 };
 
 type Result = {
-  status: "fast" | "slow" | "too-slow" | "perfect";
+  status: "too-fast" | "perfect" | "too-slow";
   deltaMs: number | null;
   message: string;
 };
 
-const SLOW_LIMIT_MS = 50;
-const PERFECT_EARLY_LIMIT_MS = -75;
+const PERFECT_MIN_MS = -150;
+const PERFECT_MAX_MS = 150;
+
+const formatSignedMs = (deltaMs: number) => (deltaMs >= 0 ? `+${deltaMs}ms` : `${deltaMs}ms`);
 
 type GameClientProps = {
   tracks: Track[];
@@ -35,7 +37,6 @@ export default function GameClient({ tracks }: GameClientProps) {
   const [audioError, setAudioError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const tooSlowTriggeredRef = useRef(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
@@ -55,7 +56,6 @@ export default function GameClient({ tracks }: GameClientProps) {
     setSelectedTrack(track);
     setResult(null);
     setAudioError(null);
-    tooSlowTriggeredRef.current = false;
     setRound((prev) => prev + 1);
     setScreen("game");
   };
@@ -71,14 +71,12 @@ export default function GameClient({ tracks }: GameClientProps) {
     setSelectedTrack(null);
     setResult(null);
     setAudioError(null);
-    tooSlowTriggeredRef.current = false;
   };
 
   const replayTrack = () => {
     if (!selectedTrack) return;
     setResult(null);
     setAudioError(null);
-    tooSlowTriggeredRef.current = false;
     setRound((prev) => prev + 1);
   };
 
@@ -94,76 +92,39 @@ export default function GameClient({ tracks }: GameClientProps) {
 
     const deltaMs = Math.round((audio.currentTime - selectedTrack.targetTime) * 1000);
 
-    if (deltaMs > SLOW_LIMIT_MS) {
+    if (deltaMs >= PERFECT_MAX_MS + 1) {
       finalizeResult({
         status: "too-slow",
         deltaMs,
-        message: "Too Slow!",
+        message: `Too Slow!\n${formatSignedMs(deltaMs)}`,
       });
       return;
     }
 
-    if (deltaMs >= PERFECT_EARLY_LIMIT_MS) {
+    if (deltaMs >= PERFECT_MIN_MS && deltaMs <= PERFECT_MAX_MS) {
       finalizeResult({
         status: "perfect",
         deltaMs,
-        message: "Perfect!",
-      });
-      return;
-    }
-
-    if (deltaMs < 0) {
-      finalizeResult({
-        status: "fast",
-        deltaMs,
-        message: `Fast!\n${deltaMs}ms`,
+        message: `Perfect!\n${formatSignedMs(deltaMs)}`,
       });
       return;
     }
 
     finalizeResult({
-      status: "slow",
+      status: "too-fast",
       deltaMs,
-      message: `Slow!\n+${deltaMs}ms`,
+      message: `Too Fast!\n${formatSignedMs(deltaMs)}`,
     });
   };
 
   const handleEnded = () => {
-    if (result || tooSlowTriggeredRef.current) return;
-    tooSlowTriggeredRef.current = true;
+    if (result) return;
     finalizeResult({
       status: "too-slow",
       deltaMs: null,
       message: "Too Slow!",
     });
   };
-
-  useEffect(() => {
-    if (!selectedTrack || result || screen !== "game") return;
-
-    let raf = 0;
-    const deadline = selectedTrack.targetTime + SLOW_LIMIT_MS / 1000;
-
-    const watchDeadline = () => {
-      const audio = audioRef.current;
-      if (!audio || audio.paused || audio.ended || result) return;
-
-      if (audio.currentTime >= deadline) {
-        tooSlowTriggeredRef.current = true;
-        finalizeResult({
-          status: "too-slow",
-          deltaMs: Math.round((audio.currentTime - selectedTrack.targetTime) * 1000),
-          message: "Too Slow!",
-        });
-        return;
-      }
-
-      raf = requestAnimationFrame(watchDeadline);
-    };
-
-    raf = requestAnimationFrame(watchDeadline);
-    return () => cancelAnimationFrame(raf);
-  }, [screen, selectedTrack, result, round]);
 
   return (
     <div className="game-root">
@@ -206,14 +167,19 @@ export default function GameClient({ tracks }: GameClientProps) {
               key={round}
               ref={audioRef}
               src={selectedTrack.src}
-              controls
               autoPlay
               preload="auto"
               onEnded={handleEnded}
               onError={() => setAudioError("Audio file not found. Check /public/music path.")}
+              className="sr-audio"
             />
 
-            {audioError && <p className="error">{audioError}</p>}
+            {audioError && <p className="error">Audio file not found. Check /public/music path.</p>}
+
+            <div className="now-playing">
+              <h3>{selectedTrack.title}</h3>
+              {selectedTrack.description && <p>{selectedTrack.description}</p>}
+            </div>
 
             <button
               type="button"
@@ -236,9 +202,6 @@ export default function GameClient({ tracks }: GameClientProps) {
             {result && (
               <section className="result-panel" aria-live="polite">
                 <p className={`grade grade-${result.status}`}>{result.message}</p>
-                {result.status === "too-slow" && result.deltaMs !== null && (
-                  <p className="muted">Late by +{result.deltaMs} ms</p>
-                )}
               </section>
             )}
           </section>
