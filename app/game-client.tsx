@@ -29,6 +29,7 @@ type GameClientProps = {
 };
 
 export default function GameClient({ tracks }: GameClientProps) {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const [screen, setScreen] = useState<Screen>("select");
   const [theme, setTheme] = useState<Theme>("light");
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -163,10 +164,13 @@ export default function GameClient({ tracks }: GameClientProps) {
 
         {screen === "game" && selectedTrack && (
           <section className="card game-card">
+            {/*
+              GH Pages serves the app under /<repo>, so we prefix basePath for public assets.
+            */}
             <audio
               key={round}
               ref={audioRef}
-              src={selectedTrack.src}
+              src={encodeURI(`${basePath}${selectedTrack.src}`)}
               autoPlay
               preload="auto"
               onEnded={handleEnded}
