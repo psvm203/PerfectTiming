@@ -20,7 +20,7 @@ type Result = {
 };
 
 const PERFECT_MIN_MS = -150;
-const PERFECT_MAX_MS = 150;
+const PERFECT_MAX_MS = 100;
 
 const formatSignedMs = (deltaMs: number) => (deltaMs >= 0 ? `+${deltaMs}ms` : `${deltaMs}ms`);
 
