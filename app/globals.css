@@ -127,6 +127,10 @@ body {
   gap: 8px;
 }
 
+.game-card {
+  min-height: 0;
+}
+
 .select-card {
   min-height: 420px;
 }
@@ -298,7 +302,12 @@ button:disabled {
 @media (max-width: 640px) {
   .game-root {
     padding: 10px;
-    overflow: auto;
+    overflow: hidden;
+  }
+
+  .game-shell {
+    min-height: calc(100dvh - 20px);
+    grid-template-rows: auto 1fr;
   }
 
   .card {
@@ -323,10 +332,35 @@ button:disabled {
     align-items: flex-start;
   }
 
+  .game-card {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: 8px;
+    min-height: 0;
+  }
+
+  .game-secondary-actions {
+    justify-content: space-between;
+  }
+
+  .game-secondary-actions button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .result-panel {
+    padding: 10px;
+  }
+
+  .grade {
+    font-size: 24px;
+    margin: 2px 0;
+  }
+
   .tap-primary {
-    height: min(52dvh, 520px);
-    min-height: 380px;
-    font-size: clamp(46px, 14vw, 72px);
+    height: clamp(150px, calc(100dvh - 360px), 44dvh);
+    min-height: 0;
+    font-size: clamp(40px, 12vw, 64px);
     border-radius: 24px;
   }
 }

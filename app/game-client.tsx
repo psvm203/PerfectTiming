@@ -201,7 +201,7 @@ export default function GameClient({ tracks }: GameClientProps) {
         )}
 
         {screen === "game" && selectedTrack && (
-          <section className="card">
+          <section className="card game-card">
             <audio
               key={round}
               ref={audioRef}
