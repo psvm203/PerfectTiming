@@ -183,8 +183,7 @@ export default function GameClient({ tracks }: GameClientProps) {
         </header>
 
         {screen === "select" && (
-          <section className="card">
-            <h2>1. Select Track</h2>
+          <section className="card select-card">
             <div className="track-grid">
               {tracks.map((track) => (
                 <article className="track-card" key={track.id}>
@@ -192,8 +191,8 @@ export default function GameClient({ tracks }: GameClientProps) {
                     <h3>{track.title}</h3>
                     {track.description && <p>{track.description}</p>}
                   </div>
-                  <button type="button" onClick={() => startTrack(track)}>
-                    Start Round
+                  <button type="button" className="track-start-btn" onClick={() => startTrack(track)}>
+                    Start
                   </button>
                 </article>
               ))}
